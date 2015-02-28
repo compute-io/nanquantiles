@@ -2,7 +2,7 @@ nanquantiles
 ===
 [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Coverage Status][coveralls-image]][coveralls-url] [![Dependencies][dependencies-image]][dependencies-url]
 
->  Computes a quantile for a numeric array ignoring all non-numeric values. 
+>  Computes a quantile for a numeric array ignoring all non-numeric values.
 
 
 ## Installation
@@ -17,18 +17,43 @@ For use in the browser, use [browserify](https://github.com/substack/node-browse
 ## Usage
 
 ``` javascript
-var foo = require( 'compute-nanquantiles' );
+var nanquantiles = require( 'compute-nanquantiles' );
 ```
 
-#### foo( arr )
+#### nanquantiles( arr, num[, opts] )
 
-What does this function do?
+Computes _q_-quantiles for a numeric `array` ignoring all non-numeric values.
 
+``` javascript
+var unsorted = [ 4, 2, null, 5, 3 ];
+
+var q = nanquantiles( unsorted, 2 );
+// returns [ 2, 3.5, 5 ]
+```
+
+If the input `array` is already sorted in __ascending__ order, set the `sorted` options flag to `true`.
+
+``` javascript
+var sorted = [ 2, 3, null, 4, 5 ];
+
+var q = quantiles( sorted, 2, {'sorted': true} );
+// returns [ 2, 3.5, 5 ];
+```
 
 ## Examples
 
 ``` javascript
-var foo = require( 'compute-nanquantiles' );
+var data = new Array( 1000 );
+
+for ( var i = 0; i < data.length; i++ ) {
+  if( i % 2 === 0){
+    data[ i ] = Math.random()*100;
+  } else {
+    data[ i ] = null;
+  }
+}
+
+console.log( nanquantiles( data, 10 ) );
 ```
 
 To run the example code from the top-level application directory,
@@ -37,6 +62,22 @@ To run the example code from the top-level application directory,
 $ node ./examples/index.js
 ```
 
+## Notes
+
+* 	This function returns the 0th and 100th quantiles; a.k.a., the min and the max. For example, when computing the median,
+
+``` javascript
+var data = new Array( 11 );
+
+for ( var i = 0; i < data.length; i++ ) {
+	data[ i ] = i+1;
+}
+
+console.log( quantiles( data, 2 ) );
+// returns [ 1, 6, 11 ]
+```
+
+the function returns `[1,6,11]`, where `min = 1`, `max = 11`, and `median = 6`. Accordingly, you should expect the output to be an `array` with `length = q + 1`, where `q` is the number of quantiles.
 
 ## Tests
 
@@ -69,7 +110,7 @@ $ make view-cov
 ---
 ## License
 
-[MIT license](http://opensource.org/licenses/MIT). 
+[MIT license](http://opensource.org/licenses/MIT).
 
 
 ## Copyright

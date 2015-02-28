@@ -1,6 +1,6 @@
 {
   "name": "compute-nanquantiles",
-  "version": "0.0.0",
+  "version": "0.9.0",
   "description": " Computes a quantile for a numeric array ignoring all non-numeric values. ",
   "author": {
     "name": "Philipp Burckhardt",
@@ -25,12 +25,22 @@
   "keywords": [
     "compute.io",
     "compute",
-    "computation"
+    "computation",
+    "statistics",
+    "stats",
+    "quantiles",
+    "percentiles"
   ],
   "bugs": {
     "url": "https://github.com/compute-io/nanquantiles/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "validate.io-array": "^1.0.3",
+    "validate.io-boolean": "^1.0.4",
+    "validate.io-integer": "^1.0.5",
+    "validate.io-number": "^1.0.3",
+    "validate.io-object": "^1.0.3"
+  },
   "devDependencies": {
     "chai": "1.x.x",
     "mocha": "1.x.x",
