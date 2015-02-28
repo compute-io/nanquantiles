@@ -26,15 +26,15 @@ describe( 'compute-nanquantiles', function tests() {
 
 	it( 'should throw an error if provided a non-array for the first argument', function test() {
 		var values = [
-				'5',
-				5,
-				true,
-				undefined,
-				null,
-				NaN,
-				function(){},
-				{}
-			];
+			'5',
+			5,
+			true,
+			undefined,
+			null,
+			NaN,
+			function(){},
+			{}
+		];
 
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[i] ) ).to.throw( TypeError );
@@ -46,18 +46,18 @@ describe( 'compute-nanquantiles', function tests() {
 		}
 	});
 
-	it( 'should throw an error if provided a non-positive integer for the number of quantiles', function test() {
+	it( 'should throw an error if not provided a nonnegative integer for the number of quantiles', function test() {
 		var values = [
-				'5',
-				-1,
-				[],
-				true,
-				undefined,
-				null,
-				NaN,
-				function(){},
-				{}
-			];
+			'5',
+			-1,
+			[],
+			true,
+			undefined,
+			null,
+			NaN,
+			function(){},
+			{}
+		];
 
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[i] ) ).to.throw( TypeError );
@@ -71,15 +71,15 @@ describe( 'compute-nanquantiles', function tests() {
 
 	it( 'should throw an error if `options` is not an object', function test(){
 		var values = [
-				'',
-				5,
-				null,
-				undefined,
-				NaN,
-				true,
-				function(){},
-				[]
-			];
+			'',
+			5,
+			null,
+			undefined,
+			NaN,
+			true,
+			function(){},
+			[]
+		];
 
 		for ( var i = 0; i < values.length; i++ ) {
 			expect( badValue( values[ i ] ) ).to.throw( TypeError );
@@ -115,8 +115,31 @@ describe( 'compute-nanquantiles', function tests() {
 		}
 	});
 
+	it( 'should throw an error if provided an accessor which is not a function', function test() {
+		var values = [
+			'5',
+			5,
+			[],
+			undefined,
+			null,
+			NaN,
+			true,
+			{}
+		];
+
+		for ( var i = 0; i < values.length; i++ ) {
+			expect( badValue( values[i] ) ).to.throw( TypeError );
+		}
+
+		function badValue( value ) {
+			return function() {
+				nanquantiles( [], 1, {'accessor': value } );
+			};
+		}
+	});
+
 	it( 'should compute quantiles', function test() {
-		var data, expected;
+		var data, expected, actual;
 
 		data = new Array( 20 );
 		for ( var i = data.length; i > 0; i-- ) {
@@ -126,7 +149,8 @@ describe( 'compute-nanquantiles', function tests() {
 		// Quantiles also returns the min and max (0th and 100th percentiles):
 		expected = [ 1, 2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20 ];
 
-		assert.deepEqual( nanquantiles( data, 10 ), expected );
+		actual = nanquantiles( data, 10 );
+		assert.deepEqual( actual, expected );
 
 		data = new Array( 11 );
 		for ( var j = data.length; j > 0; j-- ) {
@@ -135,18 +159,22 @@ describe( 'compute-nanquantiles', function tests() {
 
 		// Return the median...
 		expected = [ 1, 6, 11 ];
+		actual = nanquantiles( data, 2 );
 
-		assert.deepEqual( nanquantiles( data, 2 ), expected );
+		assert.deepEqual( actual, expected );
 
 		// Sorted:
 		data = [ 1, 2, 3, 4, 5 ];
 		expected = [ 1, 3, 5 ];
+		actual = nanquantiles( data, 2, {
+			'sorted': true
+		});
 
-		assert.deepEqual( nanquantiles( data, 2, {'sorted': true} ), expected );
+		assert.deepEqual( actual, expected );
 	});
 
 	it( 'should compute quantiles ignoring non-numeric values', function test() {
-		var data, expected;
+		var data, expected, actual;
 
 		data = new Array( 20 );
 		for ( var i = data.length; i > 0; i-- ) {
@@ -159,7 +187,8 @@ describe( 'compute-nanquantiles', function tests() {
 		// Quantiles also returns the min and max (0th and 100th percentiles):
 		expected = [ 1, 2.5, 4.5, 6.5, 8.5, 10.5, 12.5, 14.5, 16.5, 18.5, 20 ];
 
-		assert.deepEqual( nanquantiles( data, 10 ), expected );
+		actual = nanquantiles( data, 10 );
+		assert.deepEqual( actual, expected );
 
 		data = new Array( 11 );
 		for ( var j = data.length; j > 0; j-- ) {
@@ -171,14 +200,59 @@ describe( 'compute-nanquantiles', function tests() {
 
 		// Return the median...
 		expected = [ 1, 6, 11 ];
+		actual = nanquantiles( data, 2 );
 
-		assert.deepEqual( nanquantiles( data, 2 ), expected );
+		assert.deepEqual( actual, expected );
 
 		// Sorted:
 		data = [ 1, 2, 3, 4, 5 ];
 		expected = [ 1, 3, 5 ];
+		actual = nanquantiles( data, 2, {
+			'sorted': true
+		});
 
-		assert.deepEqual( nanquantiles( data, 2, {'sorted': true} ), expected );
+		assert.deepEqual( actual, expected );
+	});
+
+	it( 'should compute quantiles using an accessor function', function test() {
+		var len, data, expected, actual;
+
+		data = new Array( 11 );
+		len = data.length;
+		for ( var j = len; j > 0; j-- ) {
+			data[ j-1 ] = [len-j, j ];
+		}
+
+		// Return the median...
+		expected = [ 1, 6, 11 ];
+		actual = nanquantiles( data, 2, {
+			'accessor': getValue
+		});
+
+		function getValue( d ) {
+			return d[ 1 ];
+		}
+	});
+
+	it( 'should return `null` if provided an empty array or an array which does not contain any numeric values', function test() {
+		var data, expected, actual;
+
+		data = [
+			null,
+			undefined,
+			'',
+			[],
+			{},
+			true,
+			NaN
+		];
+		expected = null;
+		actual = nanquantiles( data, 10 );
+
+		assert.strictEqual( actual, expected );
+
+		actual = nanquantiles( [], 10 );
+		assert.strictEqual( actual, expected );
 	});
 
 });
