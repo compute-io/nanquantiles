@@ -22,7 +22,7 @@ var nanquantiles = require( 'compute-nanquantiles' );
 
 #### nanquantiles( arr, num[, opts] )
 
-Computes _q_-quantiles for an `array` ignoring non-numeric values. For unsorted primitive `arrays`,
+Computes _q_-quantiles for an `array` ignoring non-numeric values. `num` specifies the number of quantiles to compute. For unsorted primitive `arrays`,
 
 ``` javascript
 var unsorted = [ 4, 2, null, 5, 3 ];
